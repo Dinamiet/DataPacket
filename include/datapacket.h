@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define DATAPACKET_MAX_SIZE 255
+
 typedef struct _DataPacket_ DataPacket;
 
 typedef bool (*DataPacket_TransferFunction)(const void* data, const size_t size);
