@@ -6,7 +6,8 @@ void DataPacket_Init(
 		const DataPacket_TransferFunction read_callback,
 		const DataPacket_TransferFunction write_callback)
 {
-	dp->Messages = messages;
 	dp->Read     = read_callback;
 	dp->Write    = write_callback;
+	dp->Messages = messages;
+	dp->Size     = 0;
 }

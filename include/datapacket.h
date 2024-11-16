@@ -20,8 +20,8 @@ typedef struct _DataPacketMessage_
 
 typedef struct _DataPacket_
 {
-	DataPacket_TransferFunction Write;
 	DataPacket_TransferFunction Read;
+	DataPacket_TransferFunction Write;
 	const DataPacketMessage*    Messages;
 	uint8_t                     Buffer[DATAPACKET_MAX_SIZE];
 	size_t                      Size;
