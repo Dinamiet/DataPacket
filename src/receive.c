@@ -20,6 +20,13 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 	{
 		packet = (Packet*)(buffer + offset);
 
+		// Check valid message ID
+		if (!packet->Header.MessageID)
+		{
+			offset++;
+			continue;
+		}
+
 		// Check if packet size within range
 		// if not within range, increment offset and continue searching for next potential packet
 		if (packet->Header.Length > DATAPACKET_MAX_SIZE - sizeof(packet->Header))
