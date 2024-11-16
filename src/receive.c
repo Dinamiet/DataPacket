@@ -33,7 +33,7 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 		}
 
 		// Check if the packet is valid by comparing the checksum
-		uint16_t checksum = CRC16(packet->Data, packet->Header.Length, 0);
+		uint16_t checksum = BIG_ENDIAN_16(CRC16(packet->Data, packet->Header.Length, 0));
 		if (checksum != packet->Header.Checksum)
 		{
 			offset++;
