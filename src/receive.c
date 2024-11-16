@@ -12,6 +12,10 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 {
 	size_t  offset = 0;
 	Packet* packet;
+
+	if (size < sizeof(packet->Header))
+		return NULL;
+
 	while (offset < size - sizeof(packet->Header))
 	{
 		packet = (Packet*)(buffer + offset);
