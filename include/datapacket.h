@@ -9,7 +9,7 @@
 
 typedef struct _DataPacket_ DataPacket;
 
-typedef bool (*DataPacket_TransferFunction)(const void* data, const size_t size);
+typedef size_t (*DataPacket_TransferFunction)(const void* data, const size_t size);
 typedef void (*DataPacket_MessageFunction)(const DataPacket* dp, const void* data, const size_t size);
 
 typedef struct _DataPacketMessage_
@@ -20,9 +20,11 @@ typedef struct _DataPacketMessage_
 
 typedef struct _DataPacket_
 {
-	const DataPacketMessage*    Messages;
 	DataPacket_TransferFunction Write;
 	DataPacket_TransferFunction Read;
+	const DataPacketMessage*    Messages;
+	uint8_t                     Buffer[DATAPACKET_MAX_SIZE];
+	size_t                      Size;
 } DataPacket;
 
 void DataPacket_Init(

@@ -6,8 +6,8 @@
 typedef struct _PacketHeader_
 {
 	uint8_t  MessageID;
-	uint8_t  Length;
-	uint16_t Checksum;
+	uint8_t  Length;   /**< Only data, length does not include header size */
+	uint16_t Checksum; /**< Only data, checksum does not include header information */
 } PacketHeader;
 
 typedef struct _Packet_
