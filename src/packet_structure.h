@@ -17,6 +17,7 @@
 
 /**
  * Packet header structure
+ * \note Fields are in big endian format
  */
 typedef struct _PacketHeader_
 {
