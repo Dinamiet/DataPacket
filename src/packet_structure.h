@@ -15,17 +15,23 @@
 #define LITTLE_ENDIAN_32(x) __builtin_bswap32(x)
 #endif
 
+/**
+ * Packet header structure
+ */
 typedef struct _PacketHeader_
 {
-	uint8_t  MessageID;
-	uint8_t  Length;   /**< Only data, length does not include header size */
-	uint16_t Checksum; /**< Only data, checksum does not include header information */
+	uint8_t  MessageID; /**< Packet message identifier */
+	uint8_t  Length;    /**< Lenght of packet data, length does not include header size */
+	uint16_t Checksum;  /**< Checksum of packet data, checksum does not include header information */
 } PacketHeader;
 
+/**
+ * Packet structure
+ */
 typedef struct _Packet_
 {
-	PacketHeader Header;
-	uint8_t      Data[DATAPACKET_MAX_SIZE - (sizeof(PacketHeader))];
+	PacketHeader Header;                                             /** Packet header inforamtion */
+	uint8_t      Data[DATAPACKET_MAX_SIZE - (sizeof(PacketHeader))]; /** Packet data */
 } Packet;
 
 #endif
