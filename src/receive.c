@@ -2,6 +2,7 @@
 #include "datapacket.h"
 #include "packet_structure.h"
 
+#include <assert.h>
 #include <string.h>
 
 static Packet* findValidPacket(uint8_t* buffer, size_t size);
@@ -85,6 +86,9 @@ static void removePacketFromBuffer(DataPacket* dp, Packet* packet)
 
 void DataPacket_Receive(DataPacket* dp)
 {
+	assert(dp != NULL);
+	assert(dp->Read != NULL);
+
 	if (dp->Size >= DATAPACKET_MAX_SIZE) // Buffer is full - remove first byte and shift the rest left to make space for new data
 	{
 		memmove(dp->Buffer, &dp->Buffer[1], DATAPACKET_MAX_SIZE - 1);

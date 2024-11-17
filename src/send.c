@@ -2,15 +2,24 @@
 #include "datapacket.h"
 #include "packet_structure.h"
 
+#include <assert.h>
 #include <string.h>
 
 void DataPacket_Send(const DataPacket* dp, const uint8_t messageID, const void* data, const size_t size)
 {
+	assert(dp != NULL);
+	assert(dp->Write != NULL);
+	assert(messageID != 0); // Message ID of zero is reserved
+
 	Packet packet;
 	packet.Header.MessageID = messageID;
-	packet.Header.Length    = size;
-	packet.Header.Checksum  = BIG_ENDIAN_16(CRC16(data, size, 0));
-	memcpy(packet.Data, data, size);
+	packet.Header.Length    = 0;
+	if (data)
+	{
+		packet.Header.Length   = size;
+		packet.Header.Checksum = BIG_ENDIAN_16(CRC16(data, size, 0));
+		memcpy(packet.Data, data, size);
+	}
 
 	dp->Write(&packet, size + sizeof(packet.Header));
 }
