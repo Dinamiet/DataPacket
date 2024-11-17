@@ -20,8 +20,8 @@
  */
 typedef struct _PacketHeader_
 {
-	uint8_t  MessageID; /**< Packet message identifier */
-	uint8_t  Length;    /**< Lenght of packet data, length includes packet and data size */
+	uint16_t MessageID; /**< Packet message identifier */
+	uint16_t Length;    /**< Lenght of packet data, length includes packet and data size */
 	uint16_t Checksum;  /**< Checksum of packet, checksum does includes header information other than checksum field itself */
 } PacketHeader;
 

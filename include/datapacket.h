@@ -37,7 +37,7 @@ typedef void (*DataPacket_MessageFunction)(const DataPacket* dp, const void* dat
  */
 typedef struct _DataPacketMessage_
 {
-	uint8_t                    ID;       /**< Message ID */
+	uint16_t                   ID;       /**< Message ID */
 	DataPacket_MessageFunction Callback; /**< Callback function to handle the received message */
 } DataPacketMessage;
 

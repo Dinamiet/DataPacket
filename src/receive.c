@@ -20,17 +20,11 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 	while (offset < size - sizeof(packet->Header))
 	{
 		packet = (Packet*)(buffer + offset);
-
-		// Check valid message ID
-		if (!packet->Header.MessageID)
-		{
-			offset++;
-			continue;
-		}
+		uint16_t length = BIG_ENDIAN_16(packet->Header.Length);
 
 		// Check if packet size within range
 		// if not within range, increment offset and continue searching for next potential packet
-		if (packet->Header.Length > DATAPACKET_MAX_SIZE)
+		if (length > DATAPACKET_MAX_SIZE)
 		{
 			offset++;
 			continue;
@@ -38,17 +32,16 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 
 		// Ensure there is enough data in the buffer to extract a full packet
 		// if not enough data, increment offset and continue searching for next potential packet
-		if (size < packet->Header.Length)
+		if (size < length)
 		{
 			offset++;
 			continue;
 		}
 
 		// Check if the packet is valid by comparing the checksum
-		uint16_t checksum = CRC16(packet->Data, packet->Header.Length - sizeof(packet->Header), 0);
-		checksum          = CRC16(&packet->Header, sizeof(packet->Header) - sizeof(packet->Header.Checksum), checksum);
-		checksum          = BIG_ENDIAN_16(checksum);
-		if (checksum != packet->Header.Checksum)
+		uint16_t checksum = CRC16(&packet->Header, sizeof(packet->Header) - sizeof(packet->Header.Checksum), 0);
+		checksum          = CRC16(packet->Data, length - sizeof(packet->Header), checksum);
+		if (checksum != BIG_ENDIAN_16(packet->Header.Checksum))
 		{
 			offset++;
 			continue;
@@ -66,9 +59,9 @@ static void handlePacket(DataPacket* dp, Packet* packet)
 	const DataPacketMessage* message = dp->Messages;
 	while (message->Callback)
 	{
-		if (message->ID == packet->Header.MessageID)
+		if (message->ID == BIG_ENDIAN_16(packet->Header.MessageID))
 		{
-			message->Callback(dp, packet->Data, packet->Header.Length - sizeof(packet->Header));
+			message->Callback(dp, packet->Data, BIG_ENDIAN_16(packet->Header.Length) - sizeof(packet->Header));
 			return;
 		}
 
@@ -78,9 +71,9 @@ static void handlePacket(DataPacket* dp, Packet* packet)
 
 static void removePacketFromBuffer(DataPacket* dp, Packet* packet)
 {
-	uint8_t* packetEnd = ((uint8_t*)packet + packet->Header.Length);
+	uint8_t* packetEnd = ((uint8_t*)packet + BIG_ENDIAN_16(packet->Header.Length));
 	dp->Size -= (uint8_t*)packet - dp->Buffer; // Remove bytes that does not form a valid packet
-	dp->Size -= packet->Header.Length;         // Remove bytes that form a valid packet
+	dp->Size -= BIG_ENDIAN_16(packet->Header.Length); // Remove bytes that form a valid packet
 
 	memmove(dp->Buffer, packetEnd, dp->Size); // Move remaining bytes to start of buffer
 }

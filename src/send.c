@@ -12,17 +12,20 @@ void DataPacket_Send(const DataPacket* dp, const uint8_t messageID, const void* 
 	assert(messageID != 0); // Message ID of zero is reserved
 
 	Packet packet;
-	packet.Header.MessageID = messageID;
-	packet.Header.Length    = sizeof(packet.Header);
+	uint16_t length = sizeof(packet.Header);
 	if (data)
 	{
-		packet.Header.Length += size;
+		length += size;
 		memcpy(packet.Data, data, size);
 	}
 
-	packet.Header.Checksum = CRC16(packet.Data, packet.Header.Length - sizeof(packet.Header), 0);
-	packet.Header.Checksum = CRC16(&packet.Header, sizeof(packet.Header) - sizeof(packet.Header.Checksum), packet.Header.Checksum);
-	packet.Header.Checksum = BIG_ENDIAN_16(packet.Header.Checksum);
+	// Correct header fields endianness
+	packet.Header.MessageID = BIG_ENDIAN_16(messageID);
+	packet.Header.Length    = BIG_ENDIAN_16(length);
 
-	dp->Write(&packet, size + sizeof(packet.Header));
+	uint16_t checksum      = CRC16(&packet.Header, sizeof(packet.Header) - sizeof(packet.Header.Checksum), 0);
+	checksum               = CRC16(packet.Data, length - sizeof(packet.Header), checksum);
+	packet.Header.Checksum = BIG_ENDIAN_16(checksum);
+
+	dp->Write(&packet, length);
 }
