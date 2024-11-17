@@ -30,7 +30,7 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 
 		// Check if packet size within range
 		// if not within range, increment offset and continue searching for next potential packet
-		if (packet->Header.Length > DATAPACKET_MAX_SIZE - sizeof(packet->Header))
+		if (packet->Header.Length > DATAPACKET_MAX_SIZE)
 		{
 			offset++;
 			continue;
@@ -38,14 +38,16 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 
 		// Ensure there is enough data in the buffer to extract a full packet
 		// if not enough data, increment offset and continue searching for next potential packet
-		if (size < packet->Header.Length + sizeof(packet->Header))
+		if (size < packet->Header.Length)
 		{
 			offset++;
 			continue;
 		}
 
 		// Check if the packet is valid by comparing the checksum
-		uint16_t checksum = BIG_ENDIAN_16(CRC16(packet->Data, packet->Header.Length, 0));
+		uint16_t checksum = CRC16(packet->Data, packet->Header.Length - sizeof(packet->Header), 0);
+		checksum          = CRC16(&packet->Header, sizeof(packet->Header) - sizeof(packet->Header.Checksum), checksum);
+		checksum          = BIG_ENDIAN_16(checksum);
 		if (checksum != packet->Header.Checksum)
 		{
 			offset++;
@@ -66,7 +68,7 @@ static void handlePacket(DataPacket* dp, Packet* packet)
 	{
 		if (message->ID == packet->Header.MessageID)
 		{
-			message->Callback(dp, packet->Data, packet->Header.Length);
+			message->Callback(dp, packet->Data, packet->Header.Length - sizeof(packet->Header));
 			return;
 		}
 
@@ -76,10 +78,9 @@ static void handlePacket(DataPacket* dp, Packet* packet)
 
 static void removePacketFromBuffer(DataPacket* dp, Packet* packet)
 {
-	size_t   packetBufferSize = sizeof(packet->Header) + packet->Header.Length;
-	uint8_t* packetEnd        = ((uint8_t*)packet + packetBufferSize);
+	uint8_t* packetEnd = ((uint8_t*)packet + packet->Header.Length);
 	dp->Size -= (uint8_t*)packet - dp->Buffer; // Remove bytes that does not form a valid packet
-	dp->Size -= packetBufferSize;              // Remove bytes that form a valid packet
+	dp->Size -= packet->Header.Length;         // Remove bytes that form a valid packet
 
 	memmove(dp->Buffer, packetEnd, dp->Size); // Move remaining bytes to start of buffer
 }

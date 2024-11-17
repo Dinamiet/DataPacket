@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define DATAPACKET_MAX_SIZE 255 /**< Maximum size of a data packet in bytes. */
+#define DATAPACKET_MAX_SIZE 256 /**< Maximum size of a data packet in bytes. */
 
 typedef struct _DataPacket_ DataPacket;
 
