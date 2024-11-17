@@ -14,6 +14,7 @@ void DataPacket_Send(const DataPacket* dp, const uint8_t messageID, const void* 
 	Packet packet;
 	packet.Header.MessageID = messageID;
 	packet.Header.Length    = 0;
+	packet.Header.Checksum  = 0;
 	if (data)
 	{
 		packet.Header.Length   = size;
