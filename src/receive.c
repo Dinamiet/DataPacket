@@ -24,7 +24,7 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 
 		// Check if packet size within range
 		// if not within range, increment offset and continue searching for next potential packet
-		if (length > DATAPACKET_MAX_SIZE)
+		if (length == 0 || length > DATAPACKET_MAX_SIZE)
 		{
 			offset++;
 			continue;

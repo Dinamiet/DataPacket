@@ -9,7 +9,6 @@ void DataPacket_Send(const DataPacket* dp, const uint8_t messageID, const void* 
 {
 	assert(dp != NULL);
 	assert(dp->Write != NULL);
-	assert(messageID != 0); // Message ID of zero is reserved
 
 	Packet packet;
 	uint16_t length = sizeof(packet.Header);
