@@ -17,12 +17,20 @@
 typedef struct _DataPacket_ DataPacket;
 
 /**
- * Template function for transferring data to/from a instance
- * \param data Data buffer which contains the data to be transferred, or where the data needs be stored (depending on the direction of transfer).
- * \param size Number of bytes to send or receive
+ * Template function for reading data packets in and processing them
+ * \param data Data buffer where read data should be placed
+ * \param size Maximum number of bytes that can be read into data buffer
+ * \return The number of bytes actually read
+ */
+typedef size_t (*DataPacket_ReadFunction)(void* data, const size_t size);
+
+/**
+ * Template function for sending data packets out
+ * \param data Data buffer containing the data to be sent
+ * \param size Number of bytes to send
  * \return The number of bytes transferred
  */
-typedef size_t (*DataPacket_TransferFunction)(const void* data, const size_t size);
+typedef size_t (*DataPacket_WriteFunction)(const void* data, const size_t size);
 
 /**
  * Template function for handling a message received
@@ -46,8 +54,8 @@ typedef struct _DataPacketMessage_
  */
 typedef struct _DataPacket_
 {
-	DataPacket_TransferFunction Read;                        /**< Interface for reading raw data from which to extract packets */
-	DataPacket_TransferFunction Write;                       /**< Interface for writing packets */
+	DataPacket_ReadFunction     Read;                        /**< Interface for reading raw data from which to extract packets */
+	DataPacket_WriteFunction    Write;                       /**< Interface for writing packets */
 	const DataPacketMessage*    Messages;                    /**< NULL terminated array of supported messages */
 	uint8_t                     Buffer[DATAPACKET_MAX_SIZE]; /**< Buffer for holding and processing partial packets */
 	size_t                      Size;                        /** < Number of bytes currently in the buffer */
@@ -61,10 +69,10 @@ typedef struct _DataPacket_
  * \param write_callback Interface function for writing packets
  */
 void DataPacket_Init(
-		DataPacket*                       dp,
-		const DataPacketMessage*          messages,
-		const DataPacket_TransferFunction read_callback,
-		const DataPacket_TransferFunction write_callback);
+		DataPacket*                    dp,
+		const DataPacketMessage*       messages,
+		const DataPacket_ReadFunction  read_interface,
+		const DataPacket_WriteFunction write_interface);
 
 /**
  * Process incoming data and extract messages from it
