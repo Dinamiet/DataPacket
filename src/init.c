@@ -6,8 +6,8 @@ void DataPacket_Init(DataPacket* dp, const DataPacketMessage* messages, const Da
 {
 	assert(dp != NULL);
 	assert(messages != NULL);
-	assert(read_callback != NULL);
-	assert(write_callback != NULL);
+	assert(read_interface != NULL);
+	assert(write_interface != NULL);
 
 	dp->Read     = read_interface;
 	dp->Write    = write_interface;
