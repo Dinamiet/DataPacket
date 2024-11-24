@@ -22,7 +22,7 @@ typedef struct _DataPacket_ DataPacket;
  * \param size Maximum number of bytes that can be read into data buffer
  * \return The number of bytes actually read
  */
-typedef size_t (*DataPacket_ReadFunction)(void* data, const size_t size);
+typedef size_t (*DataPacket_ReadInterface)(void* data, const size_t size);
 
 /**
  * Template function for sending data packets out
@@ -30,7 +30,7 @@ typedef size_t (*DataPacket_ReadFunction)(void* data, const size_t size);
  * \param size Number of bytes to send
  * \return The number of bytes transferred
  */
-typedef size_t (*DataPacket_WriteFunction)(const void* data, const size_t size);
+typedef size_t (*DataPacket_WriteInterface)(const void* data, const size_t size);
 
 /**
  * Template function for handling a message received
@@ -38,7 +38,7 @@ typedef size_t (*DataPacket_WriteFunction)(const void* data, const size_t size);
  * \param data The message data
  * \param size Number of bytes in the message
  */
-typedef void (*DataPacket_MessageFunction)(const DataPacket* dp, const void* data, const size_t size);
+typedef void (*DataPacket_MessageHandler)(const DataPacket* dp, const void* data, const size_t size);
 
 /**
  * Data packet message structure
@@ -46,7 +46,7 @@ typedef void (*DataPacket_MessageFunction)(const DataPacket* dp, const void* dat
 typedef struct _DataPacketMessage_
 {
 	uint16_t                   ID;       /**< Message ID */
-	DataPacket_MessageFunction Callback; /**< Callback function to handle the received message */
+	DataPacket_MessageHandler  Handler;  /**< Callback function to handle the received message */
 } DataPacketMessage;
 
 /**
@@ -54,8 +54,8 @@ typedef struct _DataPacketMessage_
  */
 typedef struct _DataPacket_
 {
-	DataPacket_ReadFunction     Read;                        /**< Interface for reading raw data from which to extract packets */
-	DataPacket_WriteFunction    Write;                       /**< Interface for writing packets */
+	DataPacket_ReadInterface    Read;                        /**< Interface for reading raw data from which to extract packets */
+	DataPacket_WriteInterface   Write;                       /**< Interface for writing packets */
 	const DataPacketMessage*    Messages;                    /**< NULL terminated array of supported messages */
 	uint8_t                     Buffer[DATAPACKET_MAX_SIZE]; /**< Buffer for holding and processing partial packets */
 	size_t                      Size;                        /** < Number of bytes currently in the buffer */
@@ -65,14 +65,14 @@ typedef struct _DataPacket_
  * Initialize a data packet instance
  * \param dp The data packet instance to initialize
  * \param messages A NULL terminated array of supported messages
- * \param read_callback Interface function for reading raw data from which to extract packets
- * \param write_callback Interface function for writing packets
+ * \param read_interface Interface function for reading raw data from which to extract packets
+ * \param write_interface Interface function for writing packets
  */
 void DataPacket_Init(
-		DataPacket*                    dp,
-		const DataPacketMessage*       messages,
-		const DataPacket_ReadFunction  read_interface,
-		const DataPacket_WriteFunction write_interface);
+		DataPacket*                     dp,
+		const DataPacketMessage*        messages,
+		const DataPacket_ReadInterface  read_interface,
+		const DataPacket_WriteInterface write_interface);
 
 /**
  * Process incoming data and extract messages from it

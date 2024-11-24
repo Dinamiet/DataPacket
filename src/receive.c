@@ -57,11 +57,11 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 static void handlePacket(DataPacket* dp, Packet* packet)
 {
 	const DataPacketMessage* message = dp->Messages;
-	while (message->Callback)
+	while (message->Handler)
 	{
 		if (message->ID == BIG_ENDIAN_16(packet->Header.MessageID))
 		{
-			message->Callback(dp, packet->Data, BIG_ENDIAN_16(packet->Header.Length) - sizeof(packet->Header));
+			message->Handler(dp, packet->Data, BIG_ENDIAN_16(packet->Header.Length) - sizeof(packet->Header));
 			return;
 		}
 
