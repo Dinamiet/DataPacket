@@ -17,7 +17,7 @@ static Packet* findValidPacket(uint8_t* buffer, size_t size)
 	if (size < sizeof(packet->Header))
 		return NULL;
 
-	while (offset < size - sizeof(packet->Header))
+	while (offset < size)
 	{
 		packet = (Packet*)(buffer + offset);
 		uint16_t length = BIG_ENDIAN_16(packet->Header.Length);
